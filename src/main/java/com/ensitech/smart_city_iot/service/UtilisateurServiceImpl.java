@@ -5,6 +5,7 @@ import com.ensitech.smart_city_iot.dto.utilisateurDTO.ResponseUtilisateurDTO;
 import com.ensitech.smart_city_iot.dto.utilisateurDTO.UpdateUtilisateurDTO;
 import com.ensitech.smart_city_iot.entity.*;
 import com.ensitech.smart_city_iot.exception.BusinessException;
+import com.ensitech.smart_city_iot.exception.EntityNotFoundException;
 import com.ensitech.smart_city_iot.repository.UtilisateurRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -89,5 +90,15 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     @Override
     public void updateFields(Utilisateur utilisateur, UpdateUtilisateurDTO dto) throws Exception {
 
+    }
+
+    @Override
+    public ResponseUtilisateurDTO getUtilisateurById(Long id) throws Exception {
+        log.debug("ID Utilisateur : {}",id);
+
+        Utilisateur utilisateur = utilisateurRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
+
+        return ResponseUtilisateurDTO.fromEntity(utilisateur);
     }
 }

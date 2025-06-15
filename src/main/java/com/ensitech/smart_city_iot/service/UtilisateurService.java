@@ -17,6 +17,8 @@ public interface UtilisateurService {
 
     void updateFields(Utilisateur utilisateur, UpdateUtilisateurDTO dto) throws Exception;
 
+    ResponseUtilisateurDTO getUtilisateurById(Long id) throws Exception;
+
 
 
 }
