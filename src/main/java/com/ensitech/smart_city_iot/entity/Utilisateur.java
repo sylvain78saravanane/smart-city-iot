@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Utilisateur {
+public abstract class Utilisateur {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,6 +58,17 @@ public class Utilisateur {
     )
     private List<Permission> permissions = new ArrayList<>();
 
+    // Méthodes communes pour tout utilisateur
+    public boolean isEmailValide() {
+        return email != null && email.contains("@");
+    }
+
+    // TODO : Méthodes abstraites à implémenter dans les classes filles
+    public abstract String getRole();
+    public abstract boolean peutCreerCapteur();
+    public abstract boolean peutVoirDonneesBrutes();
+    public abstract boolean peutGenererRapport();
+    public abstract boolean peutGererUtilisateurs();
 
 
 }
