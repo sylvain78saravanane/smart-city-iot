@@ -58,7 +58,7 @@ public abstract class Utilisateur {
     private Boolean notificationActive = true;
 
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "utilisateur_permission",
             joinColumns = @JoinColumn(name = "id_utilisateur"),

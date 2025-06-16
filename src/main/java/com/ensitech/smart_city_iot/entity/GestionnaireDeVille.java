@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 public class GestionnaireDeVille extends Utilisateur{
 
     @Column(name = "code_gv")
-    private Integer codeGV;
+    private String codeGV;
 
     @Column(name = "nom_departement", length = 50)
     private String nomDepartement;
