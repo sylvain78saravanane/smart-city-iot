@@ -2,6 +2,7 @@ package com.ensitech.smart_city_iot.dto.utilisateurDTO;
 
 import com.ensitech.smart_city_iot.entity.*;
 import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Builder
+@Data
 public class ResponseUtilisateurDTO {
 
     private Long idUtilisateur;
@@ -18,6 +20,7 @@ public class ResponseUtilisateurDTO {
     private String email;
     private LocalDate dateNaissance;
     private String telephone;
+    private String numeroRue;
     private String adresse;
     private String codePostal;
     private Boolean actif;
@@ -36,6 +39,7 @@ public class ResponseUtilisateurDTO {
                 .email(utilisateur.getEmail())
                 .dateNaissance(utilisateur.getDateNaissance())
                 .telephone(utilisateur.getTelephone())
+                .numeroRue(utilisateur.getNumeroRue())
                 .adresse(utilisateur.getAdresse())
                 .codePostal(utilisateur.getCodePostal())
                 .actif(utilisateur.getActif())
