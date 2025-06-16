@@ -41,6 +41,9 @@ public class CreateUtilisateurDTO {
     @Pattern(regexp = "^[0-9+\\-\\s]{10,14}$", message = "Format de téléphone invalide")
     private String telephone;
 
+    @Size(max = 10, message = "Le numero de rue ne peux pas dépasser 10 caractères")
+    private String numeroRue;
+
     @Size(max = 100, message = "L'adresse ne peut pas dépasser 100 caractères")
     private String adresse;
 
@@ -57,12 +60,12 @@ public class CreateUtilisateurDTO {
     private Map<String, Object> donneesSpecifiques = new HashMap<>();
 
     // Méthodes utilitaires pour récupérer les données spécifiques
-    public Integer getCodeAdmin() {
-        return (Integer) donneesSpecifiques.get("codeAdmin");
+    public String getCodeAdmin() {
+        return (String) donneesSpecifiques.get("codeAdmin");
     }
 
-    public Integer getCodeGV() {
-        return (Integer) donneesSpecifiques.get("codeGV");
+    public String getCodeGV() {
+        return (String) donneesSpecifiques.get("codeGV");
     }
 
     public BigDecimal getSalaire() {
