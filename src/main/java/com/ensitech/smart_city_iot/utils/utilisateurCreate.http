@@ -1,0 +1,41 @@
+# curl -X POST http://localhost:8080/api/v1/utilisateurs
+#  -H "Content-Type: application/json"
+#  -H "Accept: application/json"
+#  -d '{
+#    "nom": "Dupont",
+#    "prenom": "Jean",
+#    "email": "jean.dupont@test.com",
+#    "motDePasse": "password123",
+#    "dateNaissance": "1980-05-15",
+#    "telephone": "0123456789",
+#    "adresse": "123 Rue Test",
+#    "codePostal": "75001",
+#    "typeUtilisateur": "CITOYEN",
+#    "donneesSpecifiques": {
+#      "latitude": 48.8566,
+#      "longitude": 2.3522
+#    }
+#  }'
+POST http://localhost:8080/api/v1/utilisateurs
+Accept: application/json
+Content-Type: application/json
+
+{
+  "nom": "",
+  "prenom": "",
+  "email": "",
+  "motDePasse": "",
+  "dateNaissance": "",
+  "telephone": "",
+  "numeroRue": "",
+  "adresse": "",
+  "codePostal": "",
+  "typeUtilisateur": "",
+  "donneesSpecifiques": {
+    "latitude": , // Integer
+    "longitude":  // Integer
+  }
+}
+
+###
+
