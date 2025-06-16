@@ -7,12 +7,11 @@ import com.ensitech.smart_city_iot.entity.*;
 import com.ensitech.smart_city_iot.exception.BusinessException;
 import com.ensitech.smart_city_iot.exception.EntityNotFoundException;
 import com.ensitech.smart_city_iot.repository.UtilisateurRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -43,6 +42,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         utilisateur.setMotDePasse(BCrypt.hashpw(dto.getMotDePasse(), BCrypt.gensalt()));
         utilisateur.setDateNaissance(dto.getDateNaissance());
         utilisateur.setTelephone(dto.getTelephone());
+        utilisateur.setNumeroRue(dto.getNumeroRue());
         utilisateur.setAdresse(dto.getAdresse());
         utilisateur.setCodePostal(dto.getCodePostal());
         utilisateur.setActif(true);
@@ -56,13 +56,59 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     private Utilisateur createSpecificUser(CreateUtilisateurDTO dto) {
         return switch (dto.getTypeUtilisateur()) {
-            case "ADMINISTRATEUR" -> new Administrateur();
+            case "ADMINISTRATEUR" -> {
+                Administrateur admin = new Administrateur();
+                // Définir les champs spécifiques de l'administrateur
+                if (dto.getCodeAdmin() != null) {
+                    admin.setCodeAdmin(String.valueOf(dto.getCodeAdmin()));
+                }
+                if (dto.getSalaire() != null) {
+                    admin.setSalaire(dto.getSalaire());
+                }
+                yield admin;
+            }
 
-            case "GESTIONNAIRE_VILLE" -> new GestionnaireDeVille();
+            case "GESTIONNAIRE_VILLE" -> {
+                GestionnaireDeVille gestionnaire = new GestionnaireDeVille();
+                // Définir les champs spécifiques du gestionnaire
+                if (dto.getCodeGV() != null) {
+                    gestionnaire.setCodeGV(dto.getCodeGV());
+                }
+                if (dto.getNomDepartement() != null) {
+                    gestionnaire.setNomDepartement(dto.getNomDepartement());
+                }
+                if (dto.getSalaire() != null) {
+                    gestionnaire.setSalaire(dto.getSalaire());
+                }
+                yield gestionnaire;
+            }
 
-            case "CHERCHEUR" -> new Chercheur();
+            case "CHERCHEUR" -> {
+                Chercheur chercheur = new Chercheur();
+                // Définir les champs spécifiques du chercheur
+                if (dto.getInstitut() != null) {
+                    chercheur.setInstitut(dto.getInstitut());
+                }
+                if (dto.getDomaineRecherche() != null) {
+                    chercheur.setDomaineRecherche(dto.getDomaineRecherche());
+                }
+                if (dto.getSalaire() != null) {
+                    chercheur.setSalaire(dto.getSalaire());
+                }
+                yield chercheur;
+            }
 
-            case "CITOYEN" -> new Citoyen();
+            case "CITOYEN" -> {
+                Citoyen citoyen = new Citoyen();
+                // Définir les champs spécifiques du citoyen
+                if (dto.getLatitude() != null) {
+                    citoyen.setLatitude(dto.getLatitude());
+                }
+                if (dto.getLongitude() != null) {
+                    citoyen.setLongitude(dto.getLongitude());
+                }
+                yield citoyen;
+            }
 
             default -> throw new BusinessException("Type d'utilisateur non supporté: " + dto.getTypeUtilisateur());
         };
@@ -74,6 +120,11 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         if (utilisateur != null && BCrypt.checkpw(password, utilisateur.getMotDePasse())){
             return utilisateur;
         }
+        return null;
+    }
+
+    @Override
+    public Administrateur loginAdmin(String email, String password, String codeAdmin) throws Exception {
         return null;
     }
 
