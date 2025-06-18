@@ -66,6 +66,7 @@ public abstract class Utilisateur {
     )
     private List<Permission> permissions = new ArrayList<>();
 
+
     // Méthodes communes pour tout utilisateur
     public boolean isEmailValide() {
         return email != null && email.contains("@");
