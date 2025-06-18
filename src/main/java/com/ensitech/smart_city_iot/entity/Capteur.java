@@ -32,10 +32,10 @@ public class Capteur {
     @Column(name = "description", length = 255)
     private String description;
 
-    @Column(name = "latitude", precision = 10, scale = 7)
+    @Column(name = "latitude", precision = 10)
     private Double latitude;
 
-    @Column(name = "longitude", precision = 10, scale = 7)
+    @Column(name = "longitude", precision = 10)
     private Double longitude;
 
     @Column(name = "adresse_installation", length = 200)

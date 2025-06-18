@@ -1,0 +1,12 @@
+POST http://localhost:8080/api/v1/commentaires
+Accept: application/json
+Content-Type: application/json
+
+{
+  "titre": "Pollution dans le centre-ville",
+  "contenu": "J'ai remarqué une augmentation de la pollution...",
+  "noteEvaluation": 3,
+  "sujet": "POLLUTION",
+  "localisation": "Centre-ville, Paris",
+  "idCitoyen": 3
+}

@@ -1,0 +1,23 @@
+POST http://localhost:8080/api/v1/capteurs
+Accept: application/json
+Content-Type: application/json
+
+{
+  "nomCapteur": "Capteur Température Centre-Ville",
+  "typeCapteur": "TEMPERATURE",
+  "description": "Capteur de température installé au centre-ville pour surveiller la température ambiante",
+  "latitude": 48.8566,
+  "longitude": 2.3522,
+  "adresseInstallation": "Place de la République, 75011 Paris",
+  "statut": "ACTIF",
+  "dateInstallation": "2025-06-15T10:00:00",
+  "frequenceMesure": 15,
+  "uniteMesure": "°C",
+  "valeurMin": -20.0,
+  "valeurMax": 50.0,
+  "numeroSerie": "TEMP001-2025",
+  "modele": "TempSensor Pro",
+  "fabricant": "IoT Solutions",
+  "idGestionnaireResponsable": 1,
+  "typeGestionnaire": "ADMINISTRATEUR"
+}

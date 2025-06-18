@@ -43,6 +43,9 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     @Query("DELETE FROM Utilisateur u WHERE u.actif = false ")
     void deleteInactifUtilisateur();
 
-    @Query("")
-    void deleteUtilisateursById();
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Utilisateur u WHERE u.idUtilisateur = :id")
+    void deleteUtilisateurById(@Param("id") Long id);
+
 }

@@ -3,7 +3,11 @@ package com.ensitech.smart_city_iot.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -50,11 +54,28 @@ public class Citoyen extends Utilisateur{
         return false;
     }
 
-    public boolean peutCommenter() {
-        return true;
+    @OneToMany(mappedBy = "citoyen", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Commentaire> commentaires = new ArrayList<>();
+
+    // Méthodes utilitaires pour la gestion des commentaires
+    public void ajouterCommentaire(Commentaire commentaire) {
+        commentaires.add(commentaire);
+        commentaire.setCitoyen(this);
     }
 
-    public boolean peutCreerAlertePersonnalisee() {
-        return true;
+    public void retirerCommentaire(Commentaire commentaire) {
+        commentaires.remove(commentaire);
+        commentaire.setCitoyen(null);
     }
+
+    public int getNombreCommentaires() {
+        return commentaires != null ? commentaires.size() : 0;
+    }
+
+    public int getNombreCommentairesActifs() {
+        return commentaires != null ?
+                (int) commentaires.stream().filter(Commentaire::isActif).count() : 0;
+    }
+
+
 }
