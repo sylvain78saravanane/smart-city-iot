@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "administrateur")
@@ -19,6 +21,9 @@ public class Administrateur extends Utilisateur {
 
     @Column(precision = 15, scale = 2)
     private BigDecimal salaire;
+
+    @OneToMany(mappedBy = "administrateur", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Capteur> capteursGeres = new ArrayList<>();
 
 
     // @OneToMany(mappedBy = "administrateur", fetch = FetchType.LAZY)
@@ -54,6 +59,17 @@ public class Administrateur extends Utilisateur {
     public String getNomComplet() {
         return "Admin " + super.getNomComplet();
     }
+
+    public void ajouterCapteur(Capteur capteur) {
+        capteursGeres.add(capteur);
+        capteur.setAdministrateur(this);
+    }
+
+    public void retirerCapteur(Capteur capteur) {
+        capteursGeres.remove(capteur);
+        capteur.setAdministrateur(null);
+    }
+
 
     public boolean hasFullAccess() {
         return true;

@@ -28,7 +28,7 @@ public class UtilisateurController {
     private UtilisateurService utilisateurService;
 
     @PostMapping("/utilisateurs")
-    public ResponseEntity<?> createUtilisateur(@RequestBody CreateUtilisateurDTO createUtilisateurDTO){
+    public ResponseEntity<?> createUtilisateur(@Valid @RequestBody CreateUtilisateurDTO createUtilisateurDTO){
         try {
             log.info("Création d'un nouvel utilisateur: {}", createUtilisateurDTO.getEmail());
             ResponseUtilisateurDTO response = utilisateurService.createUtilisateur(createUtilisateurDTO);
@@ -45,7 +45,7 @@ public class UtilisateurController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginUtilisateur) throws Exception {
+    public ResponseEntity<?> login(@Valid @RequestBody Map<String, String> loginUtilisateur) throws Exception {
         try {
             String email = loginUtilisateur.get("email");
             String motDePasse = loginUtilisateur.get("mot_de_passe");
@@ -80,14 +80,17 @@ public class UtilisateurController {
     public ResponseEntity<?> getUtilisateurById(@Valid @PathVariable Long id){
         try{
             log.debug("Demande utilisateur ID: {}", id);
+
             ResponseUtilisateurDTO response = utilisateurService.getUtilisateurById(id);
             return ResponseEntity.ok(response);
-        } catch (EntityNotFoundException e) {
-            log.warn("Utilisateur non trouvé ID: {}", id);
+
+        } catch (EntityNotFoundException entityNotFoundException) {
+            log.warn("Utilisateur non trouvé ID: {}",id,entityNotFoundException);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Utilisateur non trouvé avec l'ID: " + id));
+
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération de l'utilisateur ID: {}", id, e);
+            log.error("Erreur lors de la récupération de l'utilisateur ID: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Erreur interne du serveur"));
         }

@@ -11,5 +11,5 @@ public class Modele {
     @Column(name = "id_modele")
     private Long idModele;
 
-
+    // TODO : Finir l'entity Modèle
 }

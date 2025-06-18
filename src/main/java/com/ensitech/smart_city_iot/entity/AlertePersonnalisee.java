@@ -10,4 +10,10 @@ public class AlertePersonnalisee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_alerte_personnalisée")
     private Long idAlertePersonnalisee;
+
+    @Column
+    private String nomAlerte;
+
+    @Column
+    private Boolean active;
 }
