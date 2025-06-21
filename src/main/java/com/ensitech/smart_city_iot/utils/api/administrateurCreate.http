@@ -1,0 +1,20 @@
+POST http://localhost:8080/api/v1/utilisateurs
+Accept: application/json
+Content-Type: application/json
+
+{
+  "nom": "Martin",
+  "prenom": "Sophie",
+  "email": "sophie.martin@smartcityiot.fr",
+  "motDePasse": "password123",
+  "dateNaissance": "1985-07-22",
+  "telephone": "0987654321",
+  "numeroRue": "25",
+  "adresse": "Rue des Développeurs",
+  "codePostal": "69000",
+  "typeUtilisateur": "ADMINISTRATEUR",
+  "donneesSpecifiques": {
+    "codeAdmin": "5678",
+    "salaire": 68000
+  }
+}
