@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "chercheur")
@@ -26,6 +28,10 @@ public class Chercheur extends Utilisateur{
 
     //@OneToMany(mappedBy = "chercheur", cascade = CascadeType.ALL)
     //private List<CollaborationModele> collaborations = new ArrayList<>();
+
+    // Relation One-to-Many avec Rapport
+    @OneToMany(mappedBy = "chercheur", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rapport> rapports = new ArrayList<>();
 
     @Override
     public String getRole() {
@@ -59,5 +65,33 @@ public class Chercheur extends Utilisateur{
 
     public boolean canCollaborate() {
         return true;
+    }
+
+    // Méthodes utilitaires pour la gestion des rapports
+    public void ajouterRapport(Rapport rapport) {
+        rapports.add(rapport);
+        rapport.setChercheur(this);
+    }
+
+    public void retirerRapport(Rapport rapport) {
+        rapports.remove(rapport);
+        rapport.setChercheur(null);
+    }
+
+    public int getNombreRapports() {
+        return rapports != null ? rapports.size() : 0;
+    }
+
+    public int getNombreRapportsTermines() {
+        return rapports != null ?
+                (int) rapports.stream().filter(Rapport::isTermine).count() : 0;
+    }
+
+    public List<Rapport> getRapportsRecents(int limite) {
+        return rapports != null ?
+                rapports.stream()
+                        .sorted((r1, r2) -> r2.getDateCreation().compareTo(r1.getDateCreation()))
+                        .limit(limite)
+                        .toList() : new ArrayList<>();
     }
 }
