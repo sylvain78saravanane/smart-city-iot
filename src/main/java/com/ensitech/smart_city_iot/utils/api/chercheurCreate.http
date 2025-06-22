@@ -1,0 +1,21 @@
+POST http://localhost:8080/api/v1/utilisateurs
+Accept: application/json
+Content-Type: application/json
+
+{
+  "nom": "Martin",
+  "prenom": "Dr. Pierre",
+  "email": "pierre.martin@recherche.fr",
+  "motDePasse": "password123",
+  "dateNaissance": "1975-03-15",
+  "telephone": "0123456789",
+  "numeroRue": "42",
+  "adresse": "Boulevard de la Recherche",
+  "codePostal": "75013",
+  "typeUtilisateur": "CHERCHEUR",
+  "donneesSpecifiques": {
+    "institut": "INRIA Paris",
+    "domaineRecherche": "Intelligence Artificielle et IoT",
+    "salaire": 65000
+  }
+}
