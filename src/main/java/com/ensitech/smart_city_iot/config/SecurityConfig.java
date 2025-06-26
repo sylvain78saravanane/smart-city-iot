@@ -3,7 +3,7 @@ package com.ensitech.smart_city_iot.config;
 // TODO : Ajouter la dépendance Spring Security
 // TODO : Réaliser la configuartion de sécurité (csrf)
 
-import com.ensitech.smart_city_iot.service.jwt.JwtAuthenticatonFilter;
+import com.ensitech.smart_city_iot.config.jwt.JwtAuthenticatonFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

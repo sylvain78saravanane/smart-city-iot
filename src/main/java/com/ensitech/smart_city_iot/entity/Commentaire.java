@@ -86,11 +86,7 @@ public class Commentaire {
                 (nombreDislikes != null ? nombreDislikes : 0);
     }
 
-    public double getRatioPositif() {
-        int total = getTotalInteractions();
-        if (total == 0) return 0.0;
-        return (double) (nombreLikes != null ? nombreLikes : 0) / total * 100;
-    }
+
 
     public void ajouterLike() {
         this.nombreLikes = (this.nombreLikes != null ? this.nombreLikes : 0) + 1;

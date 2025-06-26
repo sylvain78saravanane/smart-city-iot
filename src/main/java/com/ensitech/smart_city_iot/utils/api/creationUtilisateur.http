@@ -53,9 +53,9 @@ POST http://localhost:8080/api/v1/utilisateurs
 Content-Type: application/json
 
 {
-"nom": "Test",
-"prenom": "JWT",
-"email": "test.jwt@test.com",
+"nom": "Testo",
+"prenom": "Juno",
+"email": "juno.testo@test.com",
 "motDePasse": "password123",
 "typeUtilisateur": "CITOYEN",
 "donneesSpecifiques": {
@@ -70,10 +70,11 @@ POST http://localhost:8080/api/v1/login
 Content-Type: application/json
 
 {
-"email": "test.jwt@test.com",
+"email": "juno.testo@test.com",
 "mot_de_passe": "password123"
 }
 
 ###
 
-GET http://localhost:8080/api/v1/utilisateurs/8
+GET http://localhost:8080/api/v1/utilisateurs/9
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQ0lUT1lFTiIsInVzZXJJZCI6OSwic3ViIjoianVuby50ZXN0b0B0ZXN0LmNvbSIsImlhdCI6MTc1MDk4MDg2NCwiZXhwIjoxNzUxMDY3MjY0fQ.qc5oI9k4LxwT8lS6x_NKBarZEnK1IOzofn6hmXccVqWwfujQ7AFA6H1_-nu-ZCo8bTpWcif9LTH65Phypq6S4g

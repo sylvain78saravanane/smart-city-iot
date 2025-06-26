@@ -1,4 +1,4 @@
-package com.ensitech.smart_city_iot.service.jwt;
+package com.ensitech.smart_city_iot.config.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

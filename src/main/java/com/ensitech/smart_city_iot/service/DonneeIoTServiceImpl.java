@@ -25,6 +25,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class DonneeIoTServiceImpl implements DonneeIoTService {
+
     @Autowired
     private DonneeIoTRepository donneeIoTRepository;
 
