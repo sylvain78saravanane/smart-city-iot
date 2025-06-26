@@ -1,0 +1,79 @@
+# curl -X POST http://localhost:8080/api/v1/utilisateurs
+#  -H "Content-Type: application/json"
+#  -H "Accept: application/json"
+#  -d '{
+#    "nom": "Dupont",
+#    "prenom": "Jean",
+#    "email": "jean.duponttest.com", @
+#    "motDePasse": "password123",
+#    "dateNaissance": "1980-05-15",
+#    "telephone": "0123456789",
+#    "adresse": "123 Rue Test",
+#    "codePostal": "75001",
+#    "typeUtilisateur": "CITOYEN",
+#    "donneesSpecifiques": {
+#      "latitude": 48.8566,
+#      "longitude": 2.3522
+#    }
+#  }'
+POST http://localhost:8080/api/v1/utilisateurs
+Accept: application/json
+Content-Type: application/json
+
+{
+  "nom": "Panini",
+  "prenom": "Fred",
+  "email": "fred.panini@test.com",
+  "motDePasse": "password1223",
+  "dateNaissance": "1954-03-19",
+  "telephone": "0199082102",
+  "numeroRue": "2",
+  "adresse": "Rue de la grotte",
+  "codePostal": "60001",
+  "typeUtilisateur": "CITOYEN",
+  "donneesSpecifiques": {
+    "latitude": 2.1223,
+    "longitude": 2.3522
+  }
+}
+
+###
+
+POST http://localhost:8080/api/v1/login
+Content-Type: application/json
+
+{
+  "email": "fred.panini@test.com",
+  "mot_de_passe": "password1223"
+}
+
+###
+
+POST http://localhost:8080/api/v1/utilisateurs
+Content-Type: application/json
+
+{
+"nom": "Test",
+"prenom": "JWT",
+"email": "test.jwt@test.com",
+"motDePasse": "password123",
+"typeUtilisateur": "CITOYEN",
+"donneesSpecifiques": {
+"latitude": 48.8566,
+"longitude": 2.3522
+}
+}
+
+###
+
+POST http://localhost:8080/api/v1/login
+Content-Type: application/json
+
+{
+"email": "test.jwt@test.com",
+"mot_de_passe": "password123"
+}
+
+###
+
+GET http://localhost:8080/api/v1/utilisateurs/8
