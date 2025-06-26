@@ -49,7 +49,6 @@ public class ResponseCommentaireDTO {
                 .nombreLikes(commentaire.getNombreLikes())
                 .nombreDislikes(commentaire.getNombreDislikes())
                 .totalInteractions(commentaire.getTotalInteractions())
-                .ratioPositif(commentaire.getRatioPositif())
                 .sujet(commentaire.getSujet())
                 .localisation(commentaire.getLocalisation());
 

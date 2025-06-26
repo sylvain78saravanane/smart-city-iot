@@ -1,18 +1,22 @@
 package com.ensitech.smart_city_iot.controller;
 
 import com.ensitech.smart_city_iot.dto.utilisateurDTO.CreateUtilisateurDTO;
+import com.ensitech.smart_city_iot.dto.utilisateurDTO.LoginResponseDTO;
 import com.ensitech.smart_city_iot.dto.utilisateurDTO.ResponseUtilisateurDTO;
 import com.ensitech.smart_city_iot.entity.Administrateur;
 import com.ensitech.smart_city_iot.entity.Utilisateur;
 import com.ensitech.smart_city_iot.exception.BusinessException;
 import com.ensitech.smart_city_iot.exception.EntityNotFoundException;
 import com.ensitech.smart_city_iot.service.UtilisateurService;
+import com.ensitech.smart_city_iot.service.jwt.JWTService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +31,15 @@ public class UtilisateurController {
 
     @Autowired
     private UtilisateurService utilisateurService;
+
+    @Autowired
+    private JWTService jwtService;
+
+    @Value("${jwt.expiration:86400000}")
+    private Long jwtExpiration;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/utilisateurs")
     public ResponseEntity<?> createUtilisateur(@Valid @RequestBody CreateUtilisateurDTO createUtilisateurDTO){
@@ -58,22 +71,44 @@ public class UtilisateurController {
                         .body(Map.of("error", "Email et mot de passe requis"));
             }
 
-            Utilisateur utilisateur = utilisateurService.login(email, motDePasse);
+            Utilisateur utilisateur = utilisateurService.findByEmail(email);
 
-            if (utilisateur != null) {
-                log.info("Connexion réussie pour: {}", email);
-                ResponseUtilisateurDTO response = ResponseUtilisateurDTO.fromEntity(utilisateur);
-                return ResponseEntity.ok(response);
-            } else {
-                log.warn("Échec de connexion pour: {}", email);
+            // Vérifier le mot de passe
+            if (!passwordEncoder.matches(motDePasse, utilisateur.getMotDePasse())) {
+                log.warn("Mot de passe incorrect pour: {}", email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Email ou mot de passe invalide"));
+                        .body(Map.of("error", "Email ou mot de passe incorrect"));
             }
+
+            // Vérifier que le compte est actif
+            if (!utilisateur.isActif()) {
+                log.warn("Compte désactivé pour: {}", email);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Votre compte est désactivé"));
+            }
+
+            // Générer le token JWT
+            String token = jwtService.generateToken(
+                    utilisateur.getEmail(),
+                    utilisateur.getRole(),
+                    utilisateur.getIdUtilisateur()
+            );
+
+            // Créer la réponse
+            LoginResponseDTO response = LoginResponseDTO.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .utilisateur(ResponseUtilisateurDTO.fromEntity(utilisateur))
+                    .expiresIn(jwtExpiration)
+                    .build();
+
+            log.info("Connexion réussie pour: {}", email);
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             log.error("Erreur lors de la connexion: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erreur interne du serveur", "details", e.getMessage()));
+                    .body(Map.of("error", "Erreur interne du serveur"));
         }
     }
 
