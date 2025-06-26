@@ -123,6 +123,10 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         return null;
     }
 
+    public Utilisateur findByEmail(String email) {
+        return utilisateurRepository.findByEmail(email);
+    }
+
     @Override
     public Administrateur loginAdmin(String email, String password, String codeAdmin) throws Exception {
         return null;

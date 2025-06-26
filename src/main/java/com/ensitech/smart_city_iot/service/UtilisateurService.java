@@ -10,6 +10,8 @@ public interface UtilisateurService {
 
     ResponseUtilisateurDTO createUtilisateur (CreateUtilisateurDTO dto) throws Exception;
 
+    Utilisateur findByEmail(String email);
+
     Utilisateur login(String email, String password) throws Exception;
 
     Administrateur loginAdmin (String email, String password, String codeAdmin) throws Exception;
