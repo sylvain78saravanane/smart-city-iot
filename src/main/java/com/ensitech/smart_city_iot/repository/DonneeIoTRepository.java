@@ -19,6 +19,12 @@ public interface DonneeIoTRepository extends JpaRepository<DonneeIoT, Long> {
 
     List<DonneeIoT> findByCapteurIdCapteur(Long idCapteur);
 
+    @Query("SELECT d FROM DonneeIoT d " +
+            "JOIN FETCH d.capteur c " +  // Force le chargement du capteur
+            "WHERE c.idCapteur = :idCapteur " +
+            "ORDER BY d.timestampCollecte DESC")
+    List<DonneeIoT> findLatestByCapteurWithCapteur(@Param("idCapteur") Long idCapteur, Pageable pageable);
+
     Page<DonneeIoT> findByCapteurIdCapteur(Long idCapteur, Pageable pageable);
 
     // Recherche par période

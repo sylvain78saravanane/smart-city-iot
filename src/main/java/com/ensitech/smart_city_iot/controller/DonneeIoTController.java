@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,18 +93,32 @@ public class DonneeIoTController {
      * Obtenir les dernières données d'un capteur
      */
     @GetMapping("/capteurs/{idCapteur}/donnees/latest")
+    @Transactional(readOnly = true)  // ⚡ CRUCIAL pour éviter "no session"
     public ResponseEntity<?> getLatestDonneesByCapteur(
             @PathVariable Long idCapteur,
             @RequestParam(defaultValue = "10") int limite) {
         try {
-            log.debug("Récupération des {} dernières données pour le capteur ID: {}", limite, idCapteur);
+            log.debug("📊 Récupération des {} dernières données pour le capteur ID: {}", limite, idCapteur);
 
+            // ⭐ Utiliser une requête optimisée avec JOIN FETCH
             Pageable pageable = PageRequest.of(0, limite);
-            List<DonneeIoT> donnees = donneeIoTRepository.findLatestByCapteur(idCapteur, pageable);
+            List<DonneeIoT> donnees = donneeIoTRepository.findLatestByCapteurWithCapteur(idCapteur, pageable);
+
+            if (donnees.isEmpty()) {
+                log.warn("⚠️ Aucune donnée trouvée pour le capteur {}", idCapteur);
+                return ResponseEntity.ok(Map.of(
+                        "donnees", List.of(),
+                        "total", 0,
+                        "capteur_id", idCapteur,
+                        "message", "Aucune donnée disponible pour ce capteur"
+                ));
+            }
 
             List<ResponseDonneeIoTDTO> response = donnees.stream()
                     .map(ResponseDonneeIoTDTO::fromEntity)
                     .toList();
+
+            log.info("✅ {} données trouvées pour le capteur {}", response.size(), idCapteur);
 
             return ResponseEntity.ok(Map.of(
                     "donnees", response,
@@ -111,10 +126,38 @@ public class DonneeIoTController {
                     "capteur_id", idCapteur,
                     "limite", limite
             ));
+
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération des dernières données pour le capteur {}: {}", idCapteur, e.getMessage());
+            log.error("❌ Erreur lors de la récupération des dernières données pour le capteur {}: {}",
+                    idCapteur, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erreur interne du serveur"));
+                    .body(Map.of(
+                            "error", "Erreur lors de la récupération des données",
+                            "details", e.getMessage(),
+                            "capteur_id", idCapteur
+                    ));
+        }
+    }
+
+    /**
+     * ⭐ Endpoint de test pour vérifier si le capteur existe
+     */
+    @GetMapping("/capteurs/{idCapteur}/test")
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> testCapteur(@PathVariable Long idCapteur) {
+        try {
+            // Vérifier d'abord si le capteur existe
+            long count = donneeIoTRepository.countByCapteur(idCapteur);
+
+            return ResponseEntity.ok(Map.of(
+                    "capteur_id", idCapteur,
+                    "existe", count >= 0,
+                    "nombre_donnees", count,
+                    "message", count > 0 ? "Capteur avec données" : "Capteur sans données"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
