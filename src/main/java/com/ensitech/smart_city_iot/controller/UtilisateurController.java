@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1")
 @Validated
 @Slf4j
@@ -152,31 +152,64 @@ public class UtilisateurController {
             }
 
             // Authentification de base
-            Utilisateur utilisateur = utilisateurService.login(email, motDePasse);
+            Utilisateur utilisateur = utilisateurService.findByEmail(email);
 
-            if (utilisateur != null && utilisateur instanceof Administrateur) {
-                Administrateur admin = (Administrateur) utilisateur;
+            // Vérifier le mot de passe
+            if (!passwordEncoder.matches(motDePasse, utilisateur.getMotDePasse())) {
+                log.warn("Mot de passe incorrect pour: {}", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Email ou mot de passe incorrect"));
+            }
 
-                // Vérification du code administrateur
-                if (!codeAdmin.equals(admin.getCodeAdmin())) {
-                    log.warn("Code administrateur incorrect pour: {}", email);
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(Map.of("error", "Code administrateur incorrect"));
-                }
-
-                log.info("Connexion administrateur réussie pour: {}", email);
-                ResponseUtilisateurDTO response = ResponseUtilisateurDTO.fromEntity(admin);
-                return ResponseEntity.ok(response);
-            } else {
-                log.warn("Échec de connexion administrateur pour: {}", email);
+            // Vérifier que c'est un administrateur
+            if (!(utilisateur instanceof Administrateur)) {
+                log.warn("Tentative d'accès admin avec un compte non-admin: {}", email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Identifiants administrateur invalides"));
             }
 
+            Administrateur admin = (Administrateur) utilisateur;
+
+            // Vérification du code administrateur
+            if (!codeAdmin.equals(admin.getCodeAdmin())) {
+                log.warn("Code administrateur incorrect pour: {}", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Code administrateur incorrect"));
+            }
+
+            // Vérifier que le compte est actif
+            if (!admin.isActif()) {
+                log.warn("Compte administrateur désactivé pour: {}", email);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Votre compte administrateur est désactivé"));
+            }
+
+            // Générer le token JWT pour l'admin
+            String token = jwtService.generateToken(
+                    admin.getEmail(),
+                    admin.getRole(),
+                    admin.getIdUtilisateur()
+            );
+
+            // Créer la réponse avec token (comme pour login normal)
+            LoginResponseDTO response = LoginResponseDTO.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .utilisateur(ResponseUtilisateurDTO.fromEntity(admin))
+                    .expiresIn(jwtExpiration)
+                    .build();
+
+            log.info("Connexion administrateur réussie pour: {}", email);
+            return ResponseEntity.ok(response);
+
+        } catch (EntityNotFoundException e) {
+            log.warn("Utilisateur administrateur non trouvé: {}", loginData.get("email"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Identifiants administrateur invalides"));
         } catch (Exception e) {
             log.error("Erreur lors de la connexion administrateur: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erreur interne du serveur", "details", e.getMessage()));
+                    .body(Map.of("error", "Erreur interne du serveur"));
         }
     }
 }
