@@ -49,7 +49,7 @@ public class DonneeIoTServiceImpl implements DonneeIoTService {
     /**
      * Collecte automatique des données toutes les 5 minutes pour tous les capteurs actifs
      */
-    @Scheduled(fixedRate = 900000) // 5 minutes
+    @Scheduled(fixedRate = 900000) // 15 minutes
     public void collecterDonneesAutomatiquement() {
         log.info("Début de la collecte automatique des données IoT");
 
