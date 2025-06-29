@@ -34,7 +34,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(httpSecurity))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/login", "/api/v1/admin/login").permitAll()
+                        .requestMatchers(
+                                "/api/v1/login",
+                                "/api/v1/admin/login",
+                                "/api/v1/gestionnaire/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/utilisateurs").permitAll()
                         .anyRequest().authenticated()
                 )

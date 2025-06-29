@@ -88,6 +88,7 @@ public class JwtAuthenticatonFilter extends OncePerRequestFilter {
         // Ne pas filtrer les routes publiques
         return path.equals("/api/v1/login") ||
                 path.equals("/api/v1/admin/login") ||
+                path.equals("/api/v1/gestionnaire/login") ||
                 (path.equals("/api/v1/utilisateurs") && "POST".equals(request.getMethod()));
     }
 }

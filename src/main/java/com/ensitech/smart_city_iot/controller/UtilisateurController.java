@@ -4,6 +4,7 @@ import com.ensitech.smart_city_iot.dto.utilisateurDTO.CreateUtilisateurDTO;
 import com.ensitech.smart_city_iot.dto.utilisateurDTO.LoginResponseDTO;
 import com.ensitech.smart_city_iot.dto.utilisateurDTO.ResponseUtilisateurDTO;
 import com.ensitech.smart_city_iot.entity.Administrateur;
+import com.ensitech.smart_city_iot.entity.GestionnaireDeVille;
 import com.ensitech.smart_city_iot.entity.Utilisateur;
 import com.ensitech.smart_city_iot.exception.BusinessException;
 import com.ensitech.smart_city_iot.exception.EntityNotFoundException;
@@ -208,6 +209,88 @@ public class UtilisateurController {
                     .body(Map.of("error", "Identifiants administrateur invalides"));
         } catch (Exception e) {
             log.error("Erreur lors de la connexion administrateur: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erreur interne du serveur"));
+        }
+    }
+
+    @PostMapping("/gestionnaire/login")
+    public ResponseEntity<?> loginGestionnaire(@Valid @RequestBody Map<String, String> loginData) throws Exception {
+        try {
+            String email = loginData.get("email");
+            String motDePasse = loginData.get("mot_de_passe");
+            String codeGV = loginData.get("code_gv");
+
+            log.info("Tentative de connexion gestionnaire pour: {}", email);
+
+            if (email == null || motDePasse == null || codeGV == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Email, mot de passe et code gestionnaire requis"));
+            }
+
+            // Vérification du format du code gestionnaire (4 chiffres)
+            if (!codeGV.matches("\\d{4}")) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .body(Map.of("error", "Le code gestionnaire doit contenir exactement 4 chiffres"));
+            }
+
+            // Authentification de base
+            Utilisateur utilisateur = utilisateurService.findByEmail(email);
+
+            // Vérifier le mot de passe
+            if (!passwordEncoder.matches(motDePasse, utilisateur.getMotDePasse())) {
+                log.warn("Mot de passe incorrect pour: {}", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Email ou mot de passe incorrect"));
+            }
+
+            // Vérifier que c'est un gestionnaire de ville
+            if (!(utilisateur instanceof GestionnaireDeVille)) {
+                log.warn("Tentative d'accès gestionnaire avec un compte non-gestionnaire: {}", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Identifiants gestionnaire invalides"));
+            }
+
+            GestionnaireDeVille gestionnaire = (GestionnaireDeVille) utilisateur;
+
+            // Vérification du code gestionnaire
+            if (!codeGV.equals(gestionnaire.getCodeGV())) {
+                log.warn("Code gestionnaire incorrect pour: {}", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Code gestionnaire incorrect"));
+            }
+
+            // Vérifier que le compte est actif
+            if (!gestionnaire.isActif()) {
+                log.warn("Compte gestionnaire désactivé pour: {}", email);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Votre compte gestionnaire est désactivé"));
+            }
+
+            // Générer le token JWT pour le gestionnaire
+            String token = jwtService.generateToken(
+                    gestionnaire.getEmail(),
+                    gestionnaire.getRole(),
+                    gestionnaire.getIdUtilisateur()
+            );
+
+            // Créer la réponse avec token
+            LoginResponseDTO response = LoginResponseDTO.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .utilisateur(ResponseUtilisateurDTO.fromEntity(gestionnaire))
+                    .expiresIn(jwtExpiration)
+                    .build();
+
+            log.info("Connexion gestionnaire réussie pour: {}", email);
+            return ResponseEntity.ok(response);
+
+        } catch (EntityNotFoundException e) {
+            log.warn("Utilisateur gestionnaire non trouvé: {}", loginData.get("email"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Identifiants gestionnaire invalides"));
+        } catch (Exception e) {
+            log.error("Erreur lors de la connexion gestionnaire: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Erreur interne du serveur"));
         }
